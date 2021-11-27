@@ -97,5 +97,5 @@ Misc.
 You can use the following line to get the Google spreadsheet responses
 in a copy-pastable format for the template (while disregarding commas):
 
-      awk -vFPAT='([^,]*)|("[^"]+")' -vOFS=, '{print "-"$3"|"$2"|"$4"|"$5}' santas_202X.csv
+      awk -vFPAT='([^,]*)|("[^"]+")' -vOFS=, '{print "- "$3"|"$2"|"$4"|"$5}' santas_202X.csv
 
