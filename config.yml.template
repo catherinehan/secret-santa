@@ -7,13 +7,16 @@ PASSWORD: "your-password"
 
 TIMEZONE: 'US/Pacific'
 
+# name, email, hobbies, mailing address delimited by "|"
+# The delimiter "|" should not appear elsewhere in the string
 PARTICIPANTS:
   - foo|foo@somewhere.net|hobbies|address
   - bar|bar@somewhere.net|hobbies2|address2
+  - baz|baz@somewhere.net|hobbies3|address3
+  - garply|garply@somewhere.net|hobbies4|address4
 
 DONT-PAIR:
-  - Chad, Jen    # Chad and Jen are married
-  - Chad, Bill   # Chad and Bill are best friends
+  - foo, bar    # foo and bar are married
 
 # From address should be the organizer in case participants have any questions
 FROM: You <you@gmail.net>

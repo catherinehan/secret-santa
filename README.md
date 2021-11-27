@@ -24,46 +24,46 @@ the email message if you wish.
 
 Here is the example configuration unchanged:
 
-    # Required to connect to your outgoing mail server. Example for using gmail:
-    # gmail
-    SMTP_SERVER: smtp.gmail.com
-    SMTP_PORT: 587
-    USERNAME: you@gmail.com
-    PASSWORD: "you're-password"
-
-    TIMEZONE: 'US/Pacific'
-
-    PARTICIPANTS:
-      - Chad <chad@somewhere.net>
-      - Jen <jen@gmail.net>
-      - Bill <Bill@somedomain.net>
-      - Sharon <Sharon@hi.org>
-
-    # Warning -- if you mess this up you could get an infinite loop
-    DONT-PAIR:
-      - Chad, Jen    # Chad and Jen are married
-      - Chad, Bill   # Chad and Bill are best friends
-      - Bill, Sharon
-
-    # From address should be the organizer in case participants have any questions
-    FROM: You <you@gmail.net>
-
-    # Both SUBJECT and MESSAGE can include variable substitution for the 
-    # "santa" and "santee"
-    SUBJECT: Your secret santa recipient is {santee}
-    MESSAGE: 
-      Dear {santa},
-
-      This year you are {santee}'s Secret Santa!. Ho Ho Ho!
-
-      The maximum spending limit is 50.00
-
-
-      This message was automagically generated from a computer. 
-
-      Nothing could possibly go wrong...
-
-      http://github.com/underbluewaters/secret-santa
+  # Required to connect to your outgoing mail server. Example for using gmail:
+  # gmail
+  SMTP\_SERVER: smtp.gmail.com
+  SMTP\_PORT: 587
+  USERNAME: you@gmail.com
+  PASSWORD: "your-password"
+  
+  TIMEZONE: 'US/Pacific'
+  
+  # name, email, hobbies, mailing address delimited by "|"
+  # The delimiter "|" should not appear elsewhere in the string
+  PARTICIPANTS:
+    - foo|foo@somewhere.net|hobbies|address
+    - bar|bar@somewhere.net|hobbies2|address2
+    - baz|baz@somewhere.net|hobbies3|address3
+    - garply|garply@somewhere.net|hobbies4|address4
+  
+  DONT-PAIR:
+    - foo, bar    # foo and bar are married
+  
+  # From address should be the organizer in case participants have any questions
+  FROM: You <you@gmail.net>
+  
+  # Both SUBJECT and MESSAGE can include variable substitution for the 
+  # "santa" and "santee"
+  SUBJECT: Your secret santa recipient is {santee}
+  MESSAGE: "\n
+    Dear {santa},
+    \n\n
+    Ho Ho Ho! This year you are {santee}'s Secret Santa!
+    \n\n
+    Your Secret Santa recipient told Santa that their hobbies include:
+      {hobbies}
+    \n\n
+    Please ship {santee}'s present to the following address by 12/25:
+      {address}
+    \n\n
+    Happy gifting,
+    \n
+    Santa Claus"
 
 Once configured, call secret-santa:
 
@@ -74,10 +74,10 @@ participants.
 
         Test pairings:
 
-        Chad ---> Bill
-        Jen ---> Sharon
-        Bill ---> Chad
-        Sharon ---> Jen
+        foo ---> baz
+        bar ---> garply
+        baz ---> bar
+        garply ---> foo
 
         To send out emails with new pairings,
         call with the --send argument:
