@@ -3,22 +3,17 @@
 SMTP_SERVER: smtp.gmail.com
 SMTP_PORT: 587
 USERNAME: you@gmail.com
-PASSWORD: "you're-password"
+PASSWORD: "your-password"
 
 TIMEZONE: 'US/Pacific'
 
 PARTICIPANTS:
-  - Chad <chad@somewhere.net>
-  - Jen <jen@gmail.net>
-  - Bill <Bill@somedomain.net>
-  - Sharon <Sharon@hi.org>
+  - foo|foo@somewhere.net|hobbies|address
+  - bar|bar@somewhere.net|hobbies2|address2
 
-
-# Warning -- if you mess this up you could get an infinite loop
 DONT-PAIR:
   - Chad, Jen    # Chad and Jen are married
   - Chad, Bill   # Chad and Bill are best friends
-  - Bill, Sharon
 
 # From address should be the organizer in case participants have any questions
 FROM: You <you@gmail.net>
@@ -26,17 +21,18 @@ FROM: You <you@gmail.net>
 # Both SUBJECT and MESSAGE can include variable substitution for the 
 # "santa" and "santee"
 SUBJECT: Your secret santa recipient is {santee}
-MESSAGE: 
+MESSAGE: "\n
   Dear {santa},
-  
-  This year you are {santee}'s Secret Santa!. Ho Ho Ho!
-  
-  The maximum spending limit is 50.00
-  
-  
-  This message was automagically generated from a computer. 
-  
-  Nothing could possibly go wrong...
-  
-  http://github.com/underbluewaters/secret-santa
-  
+  \n\n
+  Ho Ho Ho! This year you are {santee}'s Secret Santa!
+  \n\n
+  Your Secret Santa recipient told Santa that their hobbies include:
+    {hobbies}
+  \n\n
+  Please ship {santee}'s present to the following address by 12/25:
+    {address}
+  \n\n
+  Happy gifting,
+  \n
+  Santa Claus"
+

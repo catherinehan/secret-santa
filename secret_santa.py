@@ -46,43 +46,45 @@ Subject: {subject}
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'config.yml')
 
 class Person:
-    def __init__(self, name, email, invalid_matches):
+    def __init__(self, name, email, address, hobbies, invalid_matches):
         self.name = name
         self.email = email
+        self.address = address
+        self.hobbies = hobbies
         self.invalid_matches = invalid_matches
     
     def __str__(self):
         return "%s <%s>" % (self.name, self.email)
 
 class Pair:
-    def __init__(self, giver, reciever):
+    def __init__(self, giver, receiver):
         self.giver = giver
-        self.reciever = reciever
+        self.receiver = receiver
     
     def __str__(self):
-        return "%s ---> %s" % (self.giver.name, self.reciever.name)
+        return "%s ---> %s" % (self.giver.name, self.receiver.name)
 
 def parse_yaml(yaml_path=CONFIG_PATH):
-    return yaml.load(open(yaml_path))    
+    return yaml.load(open(yaml_path), Loader=yaml.Loader)    
 
-def choose_reciever(giver, recievers):
-    choice = random.choice(recievers)
+def choose_receiver(giver, receivers):
+    choice = random.choice(receivers)
     if choice.name in giver.invalid_matches or giver.name == choice.name:
-        if len(recievers) is 1:
-            raise Exception('Only one reciever left, try again')
-        return choose_reciever(giver, recievers)
+        if len(receivers) is 1:
+            raise Exception('Only one receiver left, try again')
+        return choose_receiver(giver, receivers)
     else:
         return choice
 
 def create_pairs(g, r):
     givers = g[:]
-    recievers = r[:]
+    receivers = r[:]
     pairs = []
     for giver in givers:
         try:
-            reciever = choose_reciever(giver, recievers)
-            recievers.remove(reciever)
-            pairs.append(Pair(giver, reciever))
+            receiver = choose_receiver(giver, receivers)
+            receivers.remove(receiver)
+            pairs.append(Pair(giver, receiver))
         except:
             return create_pairs(g, r)
     return pairs
@@ -92,14 +94,13 @@ class Usage(Exception):
     def __init__(self, msg):
         self.msg = msg
 
-
 def main(argv=None):
     if argv is None:
         argv = sys.argv
     try:
         try:
             opts, args = getopt.getopt(argv[1:], "shc", ["send", "help"])
-        except getopt.error, msg:
+        except getopt.error:
             raise Usage(msg)
     
         # option processing
@@ -118,12 +119,14 @@ def main(argv=None):
 
         participants = config['PARTICIPANTS']
         dont_pair = config['DONT-PAIR']
+        if not dont_pair: dont_pair = []    
         if len(participants) < 2:
             raise Exception('Not enough participants specified.')
         
         givers = []
         for person in participants:
-            name, email = re.match(r'([^<]*)<([^>]*)>', person).groups()
+            #name, email = re.match(r'([^<]*)<([^>]*)>', person).groups()
+            name, email, hobbies, address = person.split("|")
             name = name.strip()
             invalid_matches = []
             for pair in dont_pair:
@@ -133,23 +136,24 @@ def main(argv=None):
                     for member in names:
                         if name != member:
                             invalid_matches.append(member)
-            person = Person(name, email, invalid_matches)
+            person = Person(name, email, address, hobbies, invalid_matches)
             givers.append(person)
         
-        recievers = givers[:]
-        pairs = create_pairs(givers, recievers)
+        receivers = givers[:]
+        pairs = create_pairs(givers, receivers)
+        str_pairs = "\n".join([str(p) for p in pairs])
         if not send:
-            print """
+            print(f"""
 Test pairings:
                 
-%s
+{str_pairs}
                 
 To send out emails with new pairings,
 call with the --send argument:
 
     $ python secret_santa.py --send
             
-            """ % ("\n".join([str(p) for p in pairs]))
+            """)
         
         if send:
             server = smtplib.SMTP(config['SMTP_SERVER'], config['SMTP_PORT'])
@@ -162,7 +166,7 @@ call with the --send argument:
             message_id = '<%s@%s>' % (str(time.time())+str(random.random()), socket.gethostname())
             frm = config['FROM']
             to = pair.giver.email
-            subject = config['SUBJECT'].format(santa=pair.giver.name, santee=pair.reciever.name)
+            subject = config['SUBJECT'].format(santa=pair.giver.name, santee=pair.receiver.name)
             body = (HEADER+config['MESSAGE']).format(
                 date=date, 
                 message_id=message_id, 
@@ -170,16 +174,18 @@ call with the --send argument:
                 to=to, 
                 subject=subject,
                 santa=pair.giver.name,
-                santee=pair.reciever.name,
+                santee=pair.receiver.name,
+                address=pair.receiver.address,
+                hobbies=pair.receiver.hobbies
             )
             if send:
                 result = server.sendmail(frm, [to], body)
-                print "Emailed %s <%s>" % (pair.giver.name, to)
+                print(f"Emailed {pair.giver.name} <{to}>")
 
         if send:
             server.quit()
         
-    except Usage, err:
+    except Usage:
         print >> sys.stderr, sys.argv[0].split("/")[-1] + ": " + str(err.msg)
         print >> sys.stderr, "\t for help use --help"
         return 2
