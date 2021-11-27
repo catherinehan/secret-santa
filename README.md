@@ -6,6 +6,9 @@ randomly assigning pairings and sending emails. It can avoid pairing
 couples to their significant other, and allows custom email messages to be 
 specified.
 
+Modified from original source:
+https://github.com/underbluewaters/secret-santa
+
 Dependencies
 ------------
 
